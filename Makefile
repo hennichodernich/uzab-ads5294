@@ -17,8 +17,8 @@ VIVADO = vivado -nolog -nojournal -mode batch
 XSCT = xsct
 RM = rm -rf
 
-INITRAMFS_TAG = 3.20
-LINUX_TAG = 6.6
+INITRAMFS_TAG = 3.22
+LINUX_TAG = 6.12
 DTREE_TAG = xilinx_v2023.1
 
 INITRAMFS_DIR = tmp/initramfs-$(INITRAMFS_TAG)
@@ -29,13 +29,14 @@ LINUX_TAR = tmp/linux-$(LINUX_TAG).tar.xz
 DTREE_TAR = tmp/device-tree-xlnx-$(DTREE_TAG).tar.gz
 
 INITRAMFS_URL = https://dl-cdn.alpinelinux.org/alpine/v$(INITRAMFS_TAG)/releases/armv7/netboot/initramfs-lts
-LINUX_URL = https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-$(LINUX_TAG).44.tar.xz
+LINUX_URL = https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-$(LINUX_TAG).29.tar.xz
 DTREE_URL = https://github.com/Xilinx/device-tree-xlnx/archive/$(DTREE_TAG).tar.gz
 
 SSBL_URL = https://github.com/pavel-demin/ssbl/releases/latest/download/ssbl.elf
 
 RTL8188_TAR = tmp/rtl8188eu-main.tar.gz
-RTL8188_URL = https://github.com/pavel-demin/rtl8188eu/archive/main.tar.gz
+#RTL8188_URL = https://github.com/pavel-demin/rtl8188eu/archive/main.tar.gz
+RTL8188_URL = https://github.com/pavel-demin/rtl8188eu/archive/dd400b9ba9af2467aa7facf2192f4bdcc6d15cd0.tar.gz
 
 .PRECIOUS: tmp/cores/% tmp/vhdlcores/% tmp/%.xpr tmp/%.xsa tmp/%.bit tmp/%.fsbl/executable.elf tmp/%.tree/system-top.dts
 

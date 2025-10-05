@@ -25,7 +25,7 @@ set_property NAME $core_name $core
 set_property LIBRARY {user} $core
 set_property VENDOR {hnch} $core
 set_property VENDOR_DISPLAY_NAME {hennichodernich} $core
-set_property COMPANY_URL {https://github.com/hennichodernich/qmtech-xc7z020-notes} $core
+set_property COMPANY_URL {https://github.com/hennichodernich/qmtech-xc7z020-ads5294} $core
 set_property SUPPORTED_FAMILIES {zynq Production} $core
 
 ipx::create_xgui_files $core

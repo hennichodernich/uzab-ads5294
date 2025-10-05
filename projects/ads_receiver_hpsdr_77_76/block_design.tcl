@@ -3,13 +3,13 @@ create_bd_port -dir I lclk_p_0
 create_bd_port -dir I lclk_n_0
 create_bd_port -dir I aclk_p_0
 create_bd_port -dir I aclk_n_0
-create_bd_port -dir I -from 0 -to 0 din_a_p_0
-create_bd_port -dir I -from 0 -to 0 din_a_n_0
-create_bd_port -dir I -from 0 -to 0 din_b_p_0
-create_bd_port -dir I -from 0 -to 0 din_b_n_0
+create_bd_port -dir I -from 1 -to 0 din_a_p_0
+create_bd_port -dir I -from 1 -to 0 din_a_n_0
+create_bd_port -dir I -from 1 -to 0 din_b_p_0
+create_bd_port -dir I -from 1 -to 0 din_b_n_0
 
 create_bd_port -dir O adc_spi_sclk
-create_bd_port -dir O adc_spi_sdio
+create_bd_port -dir O adc_spi_mosi
 create_bd_port -dir O adc_spi_cs
 create_bd_port -dir O adc_reset
 
@@ -50,7 +50,7 @@ cell xilinx.com:ip:clk_wiz:6.0 mmcm_0 {
 
 # Create processing_system7
 cell xilinx.com:ip:processing_system7 ps_0 {
-  PCW_IMPORT_BOARD_PRESET cfg/qmtech_xc7z020.xml
+  PCW_IMPORT_BOARD_PRESET cfg/hnchzynqboard.xml
   PCW_USE_M_AXI_GP1 1
   PCW_FPGA0_PERIPHERAL_FREQMHZ 200
   PCW_CLK0_FREQ 200000000
@@ -59,7 +59,7 @@ cell xilinx.com:ip:processing_system7 ps_0 {
   M_AXI_GP0_ACLK mmcm_0/clk_out1
   M_AXI_GP1_ACLK mmcm_0/clk_out1
   SPI0_SCLK_O adc_spi_sclk
-  SPI0_MOSI_O adc_spi_sdio
+  SPI0_MOSI_O adc_spi_mosi
   SPI0_SS_I const_0/dout
   SPI0_SS_O adc_spi_cs
 }
@@ -86,8 +86,16 @@ cell xilinx.com:ip:proc_sys_reset rst_0 {} {
   slowest_sync_clk mmcm_0/clk_out3
 }
 
+# Create port_slicer
+cell pavel-demin:user:port_slicer slice_1 {
+  DIN_WIDTH 64 DIN_FROM 1 DIN_TO 1
+} {
+  din ps_0/GPIO_O
+}
+
 # ADC
 cell hnch:user:axis_ads5294_twolane_doubleword axis_ads5294_twolane_0 {
+  NUMBER_OF_LANES 2
 } {
   frame_clock_p aclk_p_0
   frame_clock_n aclk_n_0
@@ -99,14 +107,7 @@ cell hnch:user:axis_ads5294_twolane_doubleword axis_ads5294_twolane_0 {
   din_b_p din_b_p_0
   din_b_n din_b_n_0
   serdes_rst rst_0/peripheral_reset
-}
-
-# Create port_slicer
-cell pavel-demin:user:port_slicer slice_1 {
-  DIN_WIDTH 64 DIN_FROM 1 DIN_TO 1
-} {
-  din ps_0/GPIO_O
-  dout axis_ads5294_twolane_0/bit_slip
+  bit_slip slice_1/dout
 }
 
 # idelay_ctrl
@@ -116,10 +117,26 @@ cell xilinx.com:ip:util_idelay_ctrl util_idelay_ctrl_0 {
   rst rst_0/peripheral_reset
 }
 
+# Create port_slicer
+cell pavel-demin:user:port_slicer slice_201 {
+  DIN_WIDTH 28 DIN_FROM 13 DIN_TO 0
+} {
+  din axis_ads5294_twolane_0/data_out
+}
+cell pavel-demin:user:port_slicer slice_202 {
+  DIN_WIDTH 28 DIN_FROM 27 DIN_TO 14
+} {
+  din axis_ads5294_twolane_0/data_out
+}
+
 # sign extension
 cell hnch:user:sign_extend sign_extend_0 {
 } {
-  data_in axis_ads5294_twolane_0/data_out
+  data_in slice_201/dout
+}
+cell hnch:user:sign_extend sign_extend_1 {
+} {
+  data_in slice_202/dout
 }
 
 # RX 0
@@ -133,7 +150,7 @@ module rx_0 {
 # RX 1
 
 module rx_1 {
-  source projects/ads_receiver_hpsdr_77_76/rx.tcl
+  source projects/ads_receiver_hpsdr_77_76/rx2.tcl
 } {
   hub_0/S_AXI ps_0/M_AXI_GP1
 }

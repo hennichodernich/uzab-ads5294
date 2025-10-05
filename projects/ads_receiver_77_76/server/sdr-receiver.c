@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
   int fd, i;
   int sock_server, sock_client;
   volatile void *cfg, *sts, *fifo;
-  volatile uint8_t *rx_rst;
+  volatile uint8_t *rx_rst, *rx_sel;
   volatile uint16_t *rx_rate, *rx_cntr;
   volatile uint32_t *rx_freq;
   struct sockaddr_in addr;
@@ -76,6 +76,7 @@ int main(int argc, char *argv[])
   }
 
   rx_rst = (uint8_t *)(cfg + 0);
+  rx_sel = (uint8_t *)(cfg + 1);
   rx_rate = (uint16_t *)(cfg + 2);
   rx_freq = (uint32_t *)(cfg + 4);
 

@@ -11,8 +11,8 @@ set_property IOSTANDARD LVDS_25 [get_ports lclk_n_0]
 set_property DIFF_TERM TRUE [get_ports lclk_p_0]
 set_property DIFF_TERM TRUE [get_ports lclk_n_0]
 
-set_property PACKAGE_PIN Y20 [get_ports lclk_p_0]
-set_property PACKAGE_PIN Y21 [get_ports lclk_n_0]
+set_property PACKAGE_PIN Y18 [get_ports lclk_p_0]
+set_property PACKAGE_PIN AA18 [get_ports lclk_n_0]
 
 # clock
 
@@ -22,8 +22,8 @@ set_property IOSTANDARD LVDS_25 [get_ports aclk_n_0]
 set_property DIFF_TERM TRUE [get_ports aclk_p_0]
 set_property DIFF_TERM TRUE [get_ports aclk_n_0]
 
-set_property PACKAGE_PIN AA21 [get_ports aclk_p_0]
-set_property PACKAGE_PIN AB21 [get_ports aclk_n_0]
+set_property PACKAGE_PIN Y19 [get_ports aclk_p_0]
+set_property PACKAGE_PIN AA19 [get_ports aclk_n_0]
 
 # data
 
@@ -33,10 +33,10 @@ set_property IOSTANDARD LVDS_25 [get_ports {din_a_n_0[*]}]
 set_property DIFF_TERM true [get_ports {din_a_p_0[*]}]
 set_property DIFF_TERM true [get_ports {din_a_n_0[*]}]
 
-#set_property PACKAGE_PIN T21 [get_ports {din_a_p_0[0]}]
-#set_property PACKAGE_PIN U21 [get_ports {din_a_n_0[0]}]
-set_property PACKAGE_PIN W20 [get_ports {din_a_p_0[0]}]
-set_property PACKAGE_PIN W21 [get_ports {din_a_n_0[0]}]
+set_property PACKAGE_PIN T22 [get_ports {din_a_p_0[0]}]
+set_property PACKAGE_PIN U22 [get_ports {din_a_n_0[0]}]
+set_property PACKAGE_PIN AA22 [get_ports {din_a_p_0[1]}]
+set_property PACKAGE_PIN AB22 [get_ports {din_a_n_0[1]}]
 
 set_property IOSTANDARD LVDS_25 [get_ports {din_b_p_0[*]}]
 set_property IOSTANDARD LVDS_25 [get_ports {din_b_n_0[*]}]
@@ -44,23 +44,24 @@ set_property IOSTANDARD LVDS_25 [get_ports {din_b_n_0[*]}]
 set_property DIFF_TERM true [get_ports {din_b_p_0[*]}]
 set_property DIFF_TERM true [get_ports {din_b_n_0[*]}]
 
-#set_property PACKAGE_PIN V22 [get_ports {din_b_p_0[0]}]
-#set_property PACKAGE_PIN W22 [get_ports {din_b_n_0[0]}]
-set_property PACKAGE_PIN T22 [get_ports {din_b_p_0[0]}]
-set_property PACKAGE_PIN U22 [get_ports {din_b_n_0[0]}]
+set_property PACKAGE_PIN V22 [get_ports {din_b_p_0[0]}]
+set_property PACKAGE_PIN W22 [get_ports {din_b_n_0[0]}]
+set_property PACKAGE_PIN AA21 [get_ports {din_b_p_0[1]}]
+set_property PACKAGE_PIN AB21 [get_ports {din_b_n_0[1]}]
 
 
 # SPI
 
-set_property IOSTANDARD LVCMOS25 [get_ports adc_spi_*]
+set_property IOSTANDARD LVCMOS18 [get_ports adc_spi_*]
 
-set_property PACKAGE_PIN Y14 [get_ports adc_spi_sclk]
-set_property PACKAGE_PIN U15 [get_ports adc_spi_sdio]
-set_property PACKAGE_PIN U16 [get_ports adc_spi_cs]
+set_property PACKAGE_PIN Y9 [get_ports adc_spi_sclk]
+set_property PACKAGE_PIN W10 [get_ports adc_spi_mosi]
+set_property PACKAGE_PIN Y10 [get_ports adc_spi_miso]
+set_property PACKAGE_PIN Y11 [get_ports adc_spi_cs]
 
 # output enable
 
-set_property IOSTANDARD LVCMOS25 [get_ports {adc_reset}]
-set_property PACKAGE_PIN U20 [get_ports {adc_reset}]
+set_property IOSTANDARD LVCMOS18 [get_ports {adc_reset}]
+set_property PACKAGE_PIN W11 [get_ports {adc_reset}]
 
 

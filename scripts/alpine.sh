@@ -1,13 +1,13 @@
-alpine_url=http://dl-cdn.alpinelinux.org/alpine/v3.20
+alpine_url=http://dl-cdn.alpinelinux.org/alpine/v3.22
 
-tools_tar=apk-tools-static-2.14.4-r1.apk
+tools_tar=apk-tools-static-2.14.9-r3.apk
 tools_url=$alpine_url/main/armv7/$tools_tar
 
-firmware_tar=linux-firmware-other-20240811-r0.apk
+firmware_tar=linux-firmware-other-20250509-r0.apk
 firmware_url=$alpine_url/main/armv7/$firmware_tar
 
-linux_dir=tmp/linux-6.6
-linux_ver=6.6.44-xilinx
+linux_dir=tmp/linux-6.12
+linux_ver=6.12.29-xilinx
 
 modules_dir=alpine-modloop/lib/modules/$linux_ver
 
@@ -17,7 +17,7 @@ test -f $tools_tar || curl -L $tools_url -o $tools_tar
 
 test -f $firmware_tar || curl -L $firmware_url -o $firmware_tar
 
-for tar in linux-firmware-ath9k_htc-20240811-r0.apk linux-firmware-brcm-20240811-r0.apk linux-firmware-cypress-20240811-r0.apk linux-firmware-rtlwifi-20240811-r0.apk
+for tar in linux-firmware-ath9k_htc-20250509-r0.apk linux-firmware-brcm-20250509-r0.apk linux-firmware-cypress-20250509-r0.apk linux-firmware-rtlwifi-20250509-r0.apk
 do
   url=$alpine_url/main/armv7/$tar
   test -f $tar || curl -L $url -o $tar
@@ -36,7 +36,7 @@ depmod -a -b alpine-modloop $linux_ver
 
 tar -zxf $firmware_tar --directory=alpine-modloop/lib/modules --warning=no-unknown-keyword --strip-components=1 --wildcards lib/firmware/ar* lib/firmware/rt*
 
-for tar in linux-firmware-ath9k_htc-20240811-r0.apk linux-firmware-brcm-20240811-r0.apk linux-firmware-cypress-20240811-r0.apk linux-firmware-rtlwifi-20240811-r0.apk
+for tar in linux-firmware-ath9k_htc-20250509-r0.apk linux-firmware-brcm-20250509-r0.apk linux-firmware-cypress-20250509-r0.apk linux-firmware-rtlwifi-20250509-r0.apk
 do
   tar -zxf $tar --directory=alpine-modloop/lib/modules --warning=no-unknown-keyword --strip-components=1
 done
@@ -60,7 +60,7 @@ ln -s /media/mmcblk0p1/cache $root_dir/etc/apk/cache
 cp -r alpine/etc $root_dir/
 cp -r alpine/apps $root_dir/media/mmcblk0p1/
 
-projects="common_tools led_blinker_77_76 ads_receiver_77_76 sdr_receiver_ft8_77_76 ads_receiver_hpsdr_77_76 sdr_receiver_wspr_77_76"
+projects="common_tools led_blinker_77_76 ads_receiver_77_76 ads_receiver_hpsdr_77_76 sdr_transceiver_hpsdr"
 
 for p in $projects
 do
@@ -80,7 +80,7 @@ echo $alpine_url/community >> $root_dir/etc/apk/repositories
 chroot $root_dir /bin/sh <<- EOF_CHROOT
 
 apk update
-apk add openssh ucspi-tcp6 iw wpa_supplicant dhcpcd dnsmasq hostapd iptables avahi dbus dcron chrony gpsd libgfortran musl-dev libconfig-dev alsa-lib-dev alsa-utils curl wget less nano bc dos2unix screen
+apk add openssh u-boot-tools ucspi-tcp6 iw wpa_supplicant dhcpcd dnsmasq hostapd iptables avahi dbus dcron chrony gpsd libgfortran musl-dev libconfig-dev alsa-lib-dev alsa-utils curl wget less nano bc dos2unix screen i2c-tools
 
 rc-update add bootmisc boot
 rc-update add hostname boot
@@ -119,7 +119,7 @@ sed -i 's/^#PermitRootLogin.*/PermitRootLogin yes/' etc/ssh/sshd_config
 
 echo root:$passwd | chpasswd
 
-hostname qmtech-xc7z020
+hostname uzab
 
 sed -i 's/^# LBU_MEDIA=.*/LBU_MEDIA=mmcblk0p1/' etc/lbu/lbu.conf
 
@@ -171,7 +171,7 @@ EOF_CHROOT
 
 cp -r $root_dir/media/mmcblk0p1/apps .
 cp -r $root_dir/media/mmcblk0p1/cache .
-cp $root_dir/media/mmcblk0p1/qmtech-xc7z020.apkovl.tar.gz .
+cp $root_dir/media/mmcblk0p1/uzab.apkovl.tar.gz .
 
 cp -r alpine/wifi .
 
@@ -179,6 +179,6 @@ hostname -F /etc/hostname
 
 rm -rf $root_dir alpine-apk
 
-zip -r qmtech-xc7z020-alpine-3.20-armv7-`date +%Y%m%d`.zip apps boot.bin cache mac.txt modloop qmtech-xc7z020.apkovl.tar.gz wifi
+zip -r uzab-alpine-3.22-armv7-`date +%Y%m%d`.zip apps boot.bin cache mac.txt modloop uzab.apkovl.tar.gz wifi
 
-rm -rf apps cache modloop qmtech-xc7z020.apkovl.tar.gz wifi
+rm -rf apps cache modloop uzab.apkovl.tar.gz wifi

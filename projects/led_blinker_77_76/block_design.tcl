@@ -27,7 +27,7 @@ cell xilinx.com:ip:clk_wiz pll_0 {
 
 # Create processing_system7
 cell xilinx.com:ip:processing_system7 ps_0 {
-  PCW_IMPORT_BOARD_PRESET cfg/qmtech_xc7z020.xml
+  PCW_IMPORT_BOARD_PRESET cfg/hnchzynqboard.xml
 } {
   M_AXI_GP0_ACLK pll_0/clk_out1
   SPI0_SCLK_O adc_spi_sclk

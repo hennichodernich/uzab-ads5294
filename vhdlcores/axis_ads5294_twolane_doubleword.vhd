@@ -23,7 +23,7 @@ entity axi_ads5294_twolane_doubleword is
             sample_clk: in STD_LOGIC;
             half_clk: in STD_LOGIC;
             bit_slip: in STD_LOGIC;        
-           data_out : out STD_LOGIC_VECTOR (13 downto 0);           
+           data_out : out STD_LOGIC_VECTOR ((NUMBER_OF_LANES*14)-1 downto 0);           
            serdes_rst : in STD_LOGIC);
 end axi_ads5294_twolane_doubleword;
 
@@ -35,8 +35,7 @@ signal data_a_shift1_s, data_a_shift2_s, data_b_shift1_s, data_b_shift2_s: std_l
 
 signal frame_clock_ibuf_s, bit_slip_i, bit_clock_inv: std_logic;
 
-signal data_first, data_second, data_int: std_logic_vector(13 downto 0);
-signal data_both: std_logic_vector(27 downto 0);
+signal data_first, data_second, data_int: std_logic_vector((NUMBER_OF_LANES*14)-1 downto 0);
 
 signal matched: std_logic;
 
@@ -49,7 +48,7 @@ begin
 
     bit_clock_inv <= not bit_clock;
     
-    matched <= '1' when ((data_first = "11111111111111") and (data_second = "00000000000000")) else '0'; 
+    matched <= '1' when ((data_first(13 downto 0) = "11111111111111") and (data_second(13 downto 0) = "00000000000000")) else '0'; 
 
       process(sample_clk,state,bit_slip)
       begin
@@ -176,14 +175,14 @@ begin
             SERDES_MODE => "MASTER"
         )
         port map (
-            Q1 => data_second(0),
-            Q2 => data_second(1),
-            Q3 => data_second(2),
-            Q4 => data_second(3),
-            Q5 => data_second(4),
-            Q6 => data_second(5),
-            Q7 => data_second(6),
-            Q8 => data_first(0),
+            Q1 => data_second(14*i+0),
+            Q2 => data_second(14*i+1),
+            Q3 => data_second(14*i+2),
+            Q4 => data_second(14*i+3),
+            Q5 => data_second(14*i+4),
+            Q6 => data_second(14*i+5),
+            Q7 => data_second(14*i+6),
+            Q8 => data_first(14*i+0),
             SHIFTOUT1 => data_a_shift1_s(i),
             SHIFTOUT2 => data_a_shift2_s(i),
             BITSLIP => bit_slip_i,
@@ -217,12 +216,12 @@ begin
             SERDES_MODE => "SLAVE"
         )
         port map (
-            Q3 => data_first(1),
-            Q4 => data_first(2),
-            Q5 => data_first(3),
-            Q6 => data_first(4),
-            Q7 => data_first(5),
-            Q8 => data_first(6),
+            Q3 => data_first(14*i+1),
+            Q4 => data_first(14*i+2),
+            Q5 => data_first(14*i+3),
+            Q6 => data_first(14*i+4),
+            Q7 => data_first(14*i+5),
+            Q8 => data_first(14*i+6),
             BITSLIP => bit_slip_i,
             CE1 => '1',
             CE2 => '1',        
@@ -254,14 +253,14 @@ begin
             SERDES_MODE => "MASTER"
         )
         port map (
-            Q1 => data_second(7),
-            Q2 => data_second(8),
-            Q3 => data_second(9),
-            Q4 => data_second(10),
-            Q5 => data_second(11),
-            Q6 => data_second(12),
-            Q7 => data_second(13),
-            Q8 => data_first(7),
+            Q1 => data_second(14*i+7),
+            Q2 => data_second(14*i+8),
+            Q3 => data_second(14*i+9),
+            Q4 => data_second(14*i+10),
+            Q5 => data_second(14*i+11),
+            Q6 => data_second(14*i+12),
+            Q7 => data_second(14*i+13),
+            Q8 => data_first(14*i+7),
             SHIFTOUT1 => data_b_shift1_s(i),
             SHIFTOUT2 => data_b_shift2_s(i),
             BITSLIP => bit_slip_i,
@@ -295,12 +294,12 @@ begin
             SERDES_MODE => "SLAVE"
         )
         port map (
-            Q3 => data_first(8),
-            Q4 => data_first(9),
-            Q5 => data_first(10),
-            Q6 => data_first(11),
-            Q7 => data_first(12),
-            Q8 => data_first(13),
+            Q3 => data_first(14*i+8),
+            Q4 => data_first(14*i+9),
+            Q5 => data_first(14*i+10),
+            Q6 => data_first(14*i+11),
+            Q7 => data_first(14*i+12),
+            Q8 => data_first(14*i+13),
             BITSLIP => bit_slip_i,
             CE1 => '1',
             CE2 => '1',        
