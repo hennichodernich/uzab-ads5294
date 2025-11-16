@@ -37,6 +37,8 @@ int main(int argc, char *argv[])
   ssize_t size;
   pthread_t thread;
   volatile void *cfg, *sts;
+  volatile uint8_t *rx_sel;
+  char *end;
   uint8_t buffer[1032];
   uint8_t reply[20] = {0xef, 0xfe, 2, 0, 0, 0, 0, 0, 0, 25, 1, 'R', '_', 'P', 'I', 'T', 'A', 'Y', 'A', 8};
   uint32_t code;
@@ -44,12 +46,17 @@ int main(int argc, char *argv[])
   struct sockaddr_in addr_ep2, addr_from;
   socklen_t size_from;
   int yes = 1;
+  uint8_t chan = 0;
+  long number;
 
-  if(argc != 2)
+  errno = 0;
+  number = (argc == 3) ? strtol(argv[2], &end, 10) : -1;
+  if(errno != 0 || end == argv[2] || number < 1 || number > 2)
   {
-    fprintf(stderr, "Usage: sdr-receiver-hpsdr interface\n");
-    return EXIT_FAILURE;
+      fprintf(stderr, "Usage: sdr-receiver-hpsdr interface 1|2\n");
+      return EXIT_FAILURE;
   }
+  chan = (number - 1);
 
   if((fd = open("/dev/mem", O_RDWR)) < 0)
   {
@@ -71,6 +78,7 @@ int main(int argc, char *argv[])
   }
 
   rx_rst = (uint8_t *)(cfg + 0);
+  rx_sel = (uint8_t *)(cfg + 1);
   rx_rate = (uint16_t *)(cfg + 2);
   rx_freq = (uint32_t *)(cfg + 4);
 
@@ -84,6 +92,8 @@ int main(int argc, char *argv[])
 
   /* set default rx sample rate */
   *rx_rate = 648;
+
+  *rx_sel = chan;
 
   if((sock_ep2 = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
   {

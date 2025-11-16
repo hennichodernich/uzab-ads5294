@@ -1,6 +1,6 @@
 set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets system_i/mmcm_0/inst/clk_in1_system_mmcm_0_0]
 
-create_clock -period 3.6743 -name bit_clk -add [get_ports lclk_p_0]
+create_clock -period 3.674 -name bit_clk -add [get_ports lclk_p_0]
 create_clock -period 12.860 -name sample_clk -waveform {0.000 6.430} -add [get_ports aclk_p_0]
 
 # clock
@@ -29,25 +29,38 @@ set_property PACKAGE_PIN AA19 [get_ports aclk_n_0]
 
 set_property IOSTANDARD LVDS_25 [get_ports {din_a_p_0[*]}]
 set_property IOSTANDARD LVDS_25 [get_ports {din_a_n_0[*]}]
-
-set_property DIFF_TERM true [get_ports {din_a_p_0[*]}]
-set_property DIFF_TERM true [get_ports {din_a_n_0[*]}]
-
-set_property PACKAGE_PIN T22 [get_ports {din_a_p_0[0]}]
-set_property PACKAGE_PIN U22 [get_ports {din_a_n_0[0]}]
-set_property PACKAGE_PIN AA22 [get_ports {din_a_p_0[1]}]
-set_property PACKAGE_PIN AB22 [get_ports {din_a_n_0[1]}]
-
 set_property IOSTANDARD LVDS_25 [get_ports {din_b_p_0[*]}]
 set_property IOSTANDARD LVDS_25 [get_ports {din_b_n_0[*]}]
 
+set_property DIFF_TERM true [get_ports {din_a_p_0[*]}]
+set_property DIFF_TERM true [get_ports {din_a_n_0[*]}]
 set_property DIFF_TERM true [get_ports {din_b_p_0[*]}]
 set_property DIFF_TERM true [get_ports {din_b_n_0[*]}]
 
-set_property PACKAGE_PIN V22 [get_ports {din_b_p_0[0]}]
-set_property PACKAGE_PIN W22 [get_ports {din_b_n_0[0]}]
-set_property PACKAGE_PIN AA21 [get_ports {din_b_p_0[1]}]
-set_property PACKAGE_PIN AB21 [get_ports {din_b_n_0[1]}]
+# ADC ch 1
+#set_property PACKAGE_PIN T22 [get_ports {din_a_p_0[0]}] 
+#set_property PACKAGE_PIN U22 [get_ports {din_a_n_0[0]}]
+#set_property PACKAGE_PIN V22 [get_ports {din_b_p_0[0]}]
+#set_property PACKAGE_PIN W22 [get_ports {din_b_n_0[0]}]
+# ADC ch 8
+set_property PACKAGE_PIN V13 [get_ports {din_a_p_0[0]}] 
+set_property PACKAGE_PIN W13 [get_ports {din_a_n_0[0]}]
+set_property PACKAGE_PIN Y14 [get_ports {din_b_p_0[0]}]
+set_property PACKAGE_PIN AA14 [get_ports {din_b_n_0[0]}]
+
+# ADC ch 4
+#set_property PACKAGE_PIN AA22 [get_ports {din_a_p_0[1]}]
+#set_property PACKAGE_PIN AB22 [get_ports {din_a_n_0[1]}]
+#set_property PACKAGE_PIN AA21 [get_ports {din_b_p_0[1]}]
+#set_property PACKAGE_PIN AB21 [get_ports {din_b_n_0[1]}]
+# ADC ch 7
+set_property PACKAGE_PIN Y13 [get_ports {din_a_p_0[1]}] 
+set_property PACKAGE_PIN AA13 [get_ports {din_a_n_0[1]}]
+set_property PACKAGE_PIN W15 [get_ports {din_b_p_0[1]}]
+set_property PACKAGE_PIN Y15 [get_ports {din_b_n_0[1]}]
+
+
+
 
 
 # SPI
@@ -66,8 +79,8 @@ set_property PACKAGE_PIN AA8 [get_ports dac_clk]
 
 # output enable
 
-set_property IOSTANDARD LVCMOS18 [get_ports {adc_reset}]
-set_property PACKAGE_PIN W11 [get_ports {adc_reset}]
+set_property IOSTANDARD LVCMOS18 [get_ports {adc_reset[0]}]
+set_property PACKAGE_PIN W11 [get_ports {adc_reset[0]}]
 
 set_property IOSTANDARD LVCMOS18 [get_ports {dac_dat_o[*]}]
 set_property PACKAGE_PIN AB1 [get_ports {dac_dat_o[0]}]
@@ -85,39 +98,56 @@ set_property PACKAGE_PIN AB10 [get_ports {dac_dat_o[11]}]
 set_property PACKAGE_PIN AA11 [get_ports {dac_dat_o[12]}]
 set_property PACKAGE_PIN AB11 [get_ports {dac_dat_o[13]}]
 
+# exp_p[0] = PTT Out
+# exp_p[1] = Preamp Enable Out
+# exp_p[2] = 10 dB Attenuation
+# exp_p[3] = 20 dB Attenuation
+# exp_p[4..7] = Hermes Ctrl
 
 set_property IOSTANDARD LVCMOS33 [get_ports {exp_p_tri_io[*]}]
 set_property SLEW FAST [get_ports {exp_p_tri_io[*]}]
 set_property DRIVE 8 [get_ports {exp_p_tri_io[*]}]
 
+# PMOD3
 set_property PACKAGE_PIN A19 [get_ports {exp_p_tri_io[0]}]
 set_property PACKAGE_PIN A21 [get_ports {exp_p_tri_io[1]}]
 set_property PACKAGE_PIN A22 [get_ports {exp_p_tri_io[2]}]
 set_property PACKAGE_PIN B21 [get_ports {exp_p_tri_io[3]}]
-set_property PACKAGE_PIN B22 [get_ports {exp_p_tri_io[4]}]
-set_property PACKAGE_PIN C22 [get_ports {exp_p_tri_io[5]}]
-set_property PACKAGE_PIN D22 [get_ports {exp_p_tri_io[6]}]
-set_property PACKAGE_PIN E21 [get_ports {exp_p_tri_io[7]}]
+#NCs
+set_property PACKAGE_PIN A18 [get_ports {exp_p_tri_io[4]}]
+set_property PACKAGE_PIN C18 [get_ports {exp_p_tri_io[5]}]
+set_property PACKAGE_PIN C17 [get_ports {exp_p_tri_io[6]}]
+set_property PACKAGE_PIN C19 [get_ports {exp_p_tri_io[7]}]
+
+# exp_n[0] = PTT In
+# exp_n[1] = Dash In
+# exp_n[2] = Dot In
+# exp_n[3] = PPS In
+# exp_n[4] = SDO
+# exp_n[5] = SCK
+# exp_n[6] = STROBE_RX
+# exp_n[7] = STROBE_TX
 
 set_property IOSTANDARD LVCMOS33 [get_ports {exp_n_tri_io[*]}]
 set_property SLEW FAST [get_ports {exp_n_tri_io[*]}]
 set_property DRIVE 8 [get_ports {exp_n_tri_io[*]}]
+#PMOD1
+set_property PACKAGE_PIN B22 [get_ports {exp_n_tri_io[0]}]
+set_property PACKAGE_PIN C22 [get_ports {exp_n_tri_io[1]}]
+set_property PACKAGE_PIN D22 [get_ports {exp_n_tri_io[2]}]
+set_property PACKAGE_PIN E21 [get_ports {exp_n_tri_io[3]}]
 
-set_property PACKAGE_PIN A18 [get_ports {exp_n_tri_io[0]}]
-set_property PACKAGE_PIN C18 [get_ports {exp_n_tri_io[1]}]
-set_property PACKAGE_PIN C17 [get_ports {exp_n_tri_io[2]}]
-set_property PACKAGE_PIN C19 [get_ports {exp_n_tri_io[3]}]
-
-set_property PULLTYPE PULLUP [get_ports {exp_n_tri_io[0]}]
-set_property PULLTYPE PULLUP [get_ports {exp_n_tri_io[1]}]
-set_property PULLTYPE PULLUP [get_ports {exp_n_tri_io[2]}]
-set_property PULLTYPE PULLUP [get_ports {exp_n_tri_io[3]}]
+set_property PULLUP true [get_ports {exp_n_tri_io[0]}]
+set_property PULLUP true [get_ports {exp_n_tri_io[1]}]
+set_property PULLUP true [get_ports {exp_n_tri_io[2]}]
+set_property PULLUP true [get_ports {exp_n_tri_io[3]}]
 
 set_property IOSTANDARD LVCMOS33 [get_ports {exp_n_alex[*]}]
 set_property SLEW FAST [get_ports {exp_n_alex[*]}]
 set_property DRIVE 8 [get_ports {exp_n_alex[*]}]
-
+#PMOD2
 set_property PACKAGE_PIN B20 [get_ports {exp_n_alex[0]}]
 set_property PACKAGE_PIN C20 [get_ports {exp_n_alex[1]}]
 set_property PACKAGE_PIN D21 [get_ports {exp_n_alex[2]}]
 set_property PACKAGE_PIN F22 [get_ports {exp_n_alex[3]}]
+

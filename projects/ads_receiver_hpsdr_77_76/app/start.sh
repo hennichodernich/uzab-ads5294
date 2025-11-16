@@ -23,5 +23,5 @@ echo 2 > /proc/sys/net/ipv4/conf/all/rp_filter
 
 ip link add mvl0 link eth0 address $address type macvlan mode passthru
 
-$apps_dir/ads_receiver_hpsdr_77_76/sdr-receiver-hpsdr eth0 &
-$apps_dir/ads_receiver_hpsdr_77_76/sdr-receiver-hpsdr mvl0 &
+$apps_dir/ads_receiver_hpsdr_77_76/sdr-receiver-hpsdr eth0 1 &
+$apps_dir/ads_receiver_hpsdr_77_76/sdr-receiver-hpsdr mvl0 2 &

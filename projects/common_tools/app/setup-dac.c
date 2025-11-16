@@ -18,7 +18,7 @@
 #define AD911X_CLKMODE_ENABLE 0x04
 
 
-#define NUM_COMMANDS 4
+#define NUM_COMMANDS 5
 
 int main(int argc, char *argv[])
 {
@@ -26,7 +26,8 @@ int main(int argc, char *argv[])
 
   uint8_t data[NUM_COMMANDS * 2] =
   {
-    0x00, 0x20,		//RESET
+    0x00, 0x20,		//assert RESET
+    0x00, 0x00,		//release RESET
     (AD911X_GAINCTL_ADDR(0) + 1), (AD911X_INTERNAL_RSET_ENABLE | 0x20),
     (AD911X_GAINCTL_ADDR(1) + 1), (AD911X_INTERNAL_RSET_ENABLE | 0x20),
     (AD911X_CLKMODE_ADDR), (AD911X_CLKMODE_ENABLE | 0x00)	//DCLKIO = CLKIN
@@ -46,8 +47,6 @@ int main(int argc, char *argv[])
   for (i=0;i<NUM_COMMANDS;++i){
 	printf("%02x %02x\n",data[i*2],data[i*2+1]);
   	write(fd, &data[i*2], 2);
-       	if(i==0)
-	    sleep(1);
   }
 
   close(fd);

@@ -117,28 +117,6 @@ cell xilinx.com:ip:util_idelay_ctrl util_idelay_ctrl_0 {
   rst rst_0/peripheral_reset
 }
 
-# Create port_slicer
-cell pavel-demin:user:port_slicer slice_201 {
-  DIN_WIDTH 28 DIN_FROM 13 DIN_TO 0
-} {
-  din axis_ads5294_twolane_0/data_out
-}
-cell pavel-demin:user:port_slicer slice_202 {
-  DIN_WIDTH 28 DIN_FROM 27 DIN_TO 14
-} {
-  din axis_ads5294_twolane_0/data_out
-}
-
-# sign extension
-cell hnch:user:sign_extend sign_extend_0 {
-} {
-  data_in slice_201/dout
-}
-cell hnch:user:sign_extend sign_extend_1 {
-} {
-  data_in slice_202/dout
-}
-
 # RX 0
 
 module rx_0 {
@@ -150,7 +128,7 @@ module rx_0 {
 # RX 1
 
 module rx_1 {
-  source projects/ads_receiver_hpsdr_77_76/rx2.tcl
+  source projects/ads_receiver_hpsdr_77_76/rx.tcl
 } {
   hub_0/S_AXI ps_0/M_AXI_GP1
 }

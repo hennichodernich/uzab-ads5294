@@ -31,12 +31,12 @@ begin
     process(clk_in)
     begin
 	    if (data_valid='1') then
-				 data_rising_in <= (not data_in(dac_width-1)) & data_in(dac_width-2 downto 0);
-		    data_falling_in <= (not data_in(16+dac_width-1)) & data_in(16+dac_width-2 downto 16);
+		 data_rising_in <= (not data_in(15)) & data_in(14 downto (16-dac_width));
+		 data_falling_in <= (not data_in(31)) & data_in(30 downto (32-dac_width));
 	    else
-		   data_rising_in <= (others => '0');
-		    data_falling_in <= (others => '0');
-		end if;
+		 data_rising_in <= (others => '0');
+		 data_falling_in <= (others => '0');
+	    end if;
     end process;
 
     ddr_mux: for i in 0 to (dac_width-1) generate

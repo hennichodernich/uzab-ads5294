@@ -15,6 +15,8 @@ echo 1 > /sys/class/gpio/gpio568/value
 echo 0 > /sys/class/gpio/gpio568/value
 $apps_dir/common_tools/setup-adc n
 
+$apps_dir/common_tools/setup-dac
+
 $apps_dir/sdr_transceiver_hpsdr/sdr-transceiver-hpsdr 1 2 2 2 1 2 &
 
 address=`awk -F : '$5="FF"' OFS=: /sys/class/net/eth0/address`

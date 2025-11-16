@@ -7,6 +7,7 @@
 02.10.2016 DL9LJ: add code for controlling ICOM IC-735 (UART).
 03.12.2016 KA6S: add CW keyer code.
 16.08.2017 G8NJJ: add code for controlling G8NJJ Arduino sketch (I2C).
+05.10.2025 DC4HP: add TX level control for Hermes-Lite 2 PA (MCP4662).
 */
 
 #include <stdio.h>
@@ -42,6 +43,9 @@
 #define ADDR_DAC1 0x61 /* MCP4725 address 1 */
 #define ADDR_ARDUINO 0x40 /* G8NJJ Arduino sketch */
 #define ADDR_NUCLEO 0x55 /* NUCLEO-G071RB */
+#define ADDR_HL2DRIVE 0x2C /* MCP4662 address */
+#define ADDR_HL2CTL 0x44 /* HLAMP ATtiny address */
+#define ADDR_LPF 0x20 /* MCP23009 address 0 */
 
 volatile uint32_t *rx_freq, *tx_freq, *alex, *dac_freq;
 volatile uint16_t *rx_rate, *rx_cntr, *tx_cntr, *dac_cntr, *adc_cntr;
@@ -77,6 +81,9 @@ int i2c_dac0 = 0;
 int i2c_dac1 = 0;
 int i2c_arduino = 0;
 int i2c_nucleo = 0;
+int i2c_hl2drive = 0;
+int i2c_hl2ctl = 0;
+int i2c_lpf = 0;
 
 uint16_t i2c_pene_data = 0;
 uint16_t i2c_alex_data = 0;
@@ -86,6 +93,8 @@ uint16_t i2c_drive_data = 0;
 uint16_t i2c_dac0_data = 0xfff;
 uint16_t i2c_dac1_data = 0xfff;
 uint32_t i2c_nucleo_data[2] = {0, 0};
+uint8_t  i2c_lpf_data = 0;
+uint8_t  i2c_hl2ctl_data = 0;
 
 uint16_t i2c_ard_frx1_data = 0; /* rx 1 freq in kHz */
 uint16_t i2c_ard_frx2_data = 0; /* rx 2 freq in kHz */
@@ -168,6 +177,8 @@ uint16_t alex_data_tx = 0;
 uint16_t alex_data_0 = 0;
 uint16_t alex_data_1 = 0;
 uint16_t alex_update = 0;
+uint8_t alex_lowbyte = 0;
+uint8_t alex_highbyte = 0;
 
 uint32_t freq_data[3] = {0, 0, 0};
 
@@ -440,6 +451,11 @@ int main(int argc, char *argv[])
     chan |= (number - 1) << i;
   }
 
+  printf("sdr-transceiver-hpsdr (patched by hennichodernich DC4HP), built on %s %s\n",__DATE__, __TIME__);
+#ifdef THETIS
+  printf("compiled in Thetis compatibility mode\n");
+#endif
+
   if((fd = open("/dev/mem", O_RDWR)) < 0)
   {
     perror("open");
@@ -462,8 +478,16 @@ int main(int argc, char *argv[])
     if(ioctl(i2c_fd, I2C_SLAVE_FORCE, ADDR_PENE) >= 0)
     {
       /* set all pins to low */
-      if(i2c_write_addr_data16(i2c_fd, 0x02, 0x0000) > 0)
+      if(i2c_write_addr_data8(i2c_fd, 0x09, 0x00) > 0)
       {
+	printf("detected MCP23009 LPF controller\n");
+	i2c_lpf = 1;
+        i2c_write_addr_data8(i2c_fd, 0x00, 0xF0);
+        i2c_write_addr_data8(i2c_fd, 0x06, 0xFF);
+      }
+      else if(i2c_write_addr_data16(i2c_fd, 0x02, 0x0000) > 0)
+      {
+	printf("detected PCF9555 on address 0x%02X\n",ADDR_PENE);
         i2c_pene = 1;
         /* configure all pins as output */
         i2c_write_addr_data16(i2c_fd, 0x06, 0x0000);
@@ -474,6 +498,7 @@ int main(int argc, char *argv[])
       /* set all pins to low */
       if(i2c_write_addr_data16(i2c_fd, 0x02, 0x0000) > 0)
       {
+	printf("detected PCF9555 on address 0x%02X\n",ADDR_ALEX);
         i2c_alex = 1;
         /* configure all pins as output */
         i2c_write_addr_data16(i2c_fd, 0x06, 0x0000);
@@ -484,6 +509,7 @@ int main(int argc, char *argv[])
       /* set all pins to low */
       if(i2c_write_addr_data16(i2c_fd, 0x02, 0x0000) > 0)
       {
+	printf("detected PCF9555 DAC on address 0x%02X\n",ADDR_LEVEL);
         i2c_level = 1;
         /* configure all pins as output */
         i2c_write_addr_data16(i2c_fd, 0x06, 0x0000);
@@ -494,6 +520,7 @@ int main(int argc, char *argv[])
       /* set all pins to low */
       if(i2c_write_addr_data16(i2c_fd, 0x02, 0x0000) > 0)
       {
+	printf("detected PCF9555 on address 0x%02X\n",ADDR_MISC);
         i2c_misc = 1;
         /* configure all pins as output */
         i2c_write_addr_data16(i2c_fd, 0x06, 0x0000);
@@ -504,6 +531,7 @@ int main(int argc, char *argv[])
       /* set both potentiometers to 0 */
       if(i2c_write_addr_data16(i2c_fd, 0xa9, 0x0000) > 0)
       {
+	printf("detected DS1803 potentiometer\n");
         i2c_drive = 1;
       }
     }
@@ -525,6 +553,7 @@ int main(int argc, char *argv[])
     {
       if(i2c_write_addr_data16(i2c_fd, 0x1, i2c_ard_frx1_data) > 0)
       {
+	printf("detected G8NJJ Arduino\n");
         i2c_arduino = 1;
       }
     }
@@ -534,6 +563,27 @@ int main(int argc, char *argv[])
       {
         i2c_nucleo = 1;
       }
+    }
+    if(ioctl(i2c_fd, I2C_SLAVE, ADDR_HL2DRIVE) >= 0)
+    {
+      /* set both potentiometers to 0 */
+      if(i2c_write_data16(i2c_fd, 0x0000) > 0)
+      {
+	i2c_write_data16(i2c_fd, 0x1000);
+	printf("detected MCP4662 potentiometer\n");
+        i2c_hl2drive = 1;
+      }
+      if(ioctl(i2c_fd, I2C_SLAVE, ADDR_HL2CTL) >= 0)
+      {
+	//disable PA
+        if(i2c_write_addr_data8(i2c_fd, 0x03, 0x00) > 0)
+	{
+	  printf("detected device on address %02x - assuming hlamp is present\n",ADDR_HL2CTL);
+	  i2c_hl2ctl = 1;
+	}
+
+      }
+
     }
     if(ioctl(i2c_fd, I2C_SLAVE, ADDR_CODEC) >= 0)
     {
@@ -560,6 +610,10 @@ int main(int argc, char *argv[])
         i2c_write_addr_data8(i2c_fd, 0x0c, 0x41);
       }
     }
+  }
+  if(!i2c_level && !i2c_drive && !i2c_hl2drive && !i2c_arduino)
+  {
+      printf("no HW TX level control found, using software scaling\n");
   }
 
   cfg = mmap(NULL, sysconf(_SC_PAGESIZE), PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0x40000000);
@@ -632,10 +686,10 @@ int main(int argc, char *argv[])
   *tx_size = size;
 
   /* set default tx level */
-  *tx_level = 21910;
+  *tx_level = 255*128;
 
   /* set ps level */
-  *ps_level = 18716;
+  *ps_level = 23461;
 
   /* set default tx mux channel */
   *tx_rst &= ~16;
@@ -997,6 +1051,16 @@ void process_ep2(uint8_t *frame)
           i2c_write_addr_data24(i2c_fd, 0x4, data32);
         }
       }
+      if (i2c_hl2ctl)
+      {
+	if(ptt != i2c_hl2ctl_data)
+	{
+	  i2c_hl2ctl_data = ptt;
+          ioctl(i2c_fd, I2C_SLAVE, ADDR_HL2CTL);
+          i2c_write_addr_data8(i2c_fd, 0x3, i2c_hl2ctl_data);
+
+	}
+      }
       break;
     case 2:
     case 3:
@@ -1130,9 +1194,40 @@ void process_ep2(uint8_t *frame)
         alex_update = 1;
       }
 
+      if (frame[2] & 0x40)	//manual filters
+      {
+	  alex_lowbyte = frame[3];
+	  alex_highbyte = frame[4];
+      }
+      else
+      {
+	  alex_lowbyte = frame[3] & 0x80;
+	  if (freq_data[0] > 35600000L) {            // > 10m so use 6m LPF
+          	alex_highbyte = 0x10; 
+	  } 
+	  else if (freq_data[0] > 24000000L)  {    // > 15m so use 10/12m LPF
+          	alex_highbyte = 0x20;
+          } 
+	  else if (freq_data[0] > 16500000L) {     // > 20m so use 17/15m LPF
+          	alex_highbyte = 0x40;
+          } 
+	  else if (freq_data[0] >  8000000L) {     // > 40m so use 30/20m LPF
+          	alex_highbyte = 0x01;
+          } 
+	  else if (freq_data[0] >  5000000L) {     // > 80m so use 60/40m LPF
+          	alex_highbyte = 0x02;
+          } 
+	  else if (freq_data[0] >  2500000L) {     // > 160m so use 80m LPF
+          	alex_highbyte = 0x04;
+          } 
+	  else {                                   // < 2.5 MHz use 160m LPF
+          	alex_highbyte = 0x08;
+          }
+      }
+
       if(i2c_misc)
       {
-        data = (frame[3] & 0x80) >> 6 | (frame[3] & 0x20) >> 5;
+        data = (alex_lowbyte & 0x80) >> 6 | (alex_lowbyte & 0x20) >> 5;
         if(misc_data_2 != data)
         {
           misc_data_2 = data;
@@ -1142,7 +1237,7 @@ void process_ep2(uint8_t *frame)
 
       if(i2c_nucleo)
       {
-        data = (frame[3] & 0xe0) >> 5;
+        data = (alex_lowbyte & 0xe0) >> 5;
         if(nucleo_data_1 != data)
         {
           nucleo_data_1 = data;
@@ -1153,7 +1248,7 @@ void process_ep2(uint8_t *frame)
       /* configure ALEX */
       if(i2c_alex)
       {
-        data = frame[4] << 8 | frame[3];
+        data = alex_highbyte << 8 | alex_lowbyte;
         if(i2c_alex_data != data)
         {
           i2c_alex_data = data;
@@ -1161,7 +1256,35 @@ void process_ep2(uint8_t *frame)
           i2c_write_addr_data16(i2c_fd, 0x02, data);
         }
       }
+      
+      if(i2c_lpf)
+      {
+	if ((alex_highbyte & 0x08) || (alex_highbyte & 0x04))	/* 160m and 80m */
+	        data = 0x01;
+	else if (alex_highbyte & 0x02)	/* 60/40m */
+	        data = 0x02;
+	else if (alex_highbyte & 0x01)	/* 30/20m */
+	        data = 0x04;
+	else if (alex_highbyte & 0x40)	/* 17/15m */
+		if (freq_data[0] < 19000000)
+		        data = 0x04;
+		else
+	        	data = 0x08;
+	else if (alex_highbyte & 0x20)	/* 12/10m */
+	        data = 0x08;
+	else if (alex_highbyte & 0x10)	/* 6m */
+	        data = 0x00;
+	else
+		data = 0x00;
 
+        if(i2c_lpf_data != data)
+        {
+          i2c_lpf_data = data;
+          ioctl(i2c_fd, I2C_SLAVE, ADDR_LPF);
+          i2c_write_addr_data8(i2c_fd, 0x09, data);
+        }
+      }
+      
       /* configure level */
       data = frame[1];
       if(i2c_level)
@@ -1200,9 +1323,19 @@ void process_ep2(uint8_t *frame)
           i2c_write_addr_data24(i2c_fd, 0x05, data32);
         }
       }
+      else if(i2c_hl2drive)
+      {
+        if(i2c_drive_data != data)
+        {
+          i2c_drive_data = data;
+          ioctl(i2c_fd, I2C_SLAVE, ADDR_HL2DRIVE);
+	  i2c_write_data16(i2c_fd, 0x0000 | data);
+	  i2c_write_data16(i2c_fd, 0x1000 | data);
+        }
+      }
       else
       {
-        *tx_level = (int16_t)floor(data * 85.920 + 0.5);
+        *tx_level = (int16_t)floor(data * 128.0 + 0.5);
       }
       /* configure microphone boost */
       if(i2c_codec)
