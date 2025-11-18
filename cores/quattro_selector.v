@@ -11,11 +11,6 @@ module quattro_selector #
   output wire [DOUT_WIDTH-1:0]   dout
 );
 
-  case (cfg)
-	  2'b00: assign dout = din[DOUT_WIDTH-1:0];
-	  2'b01: assign dout = din[2*DOUT_WIDTH-1:DOUT_WIDTH];
-	  2'b10: assign dout = din[3*DOUT_WIDTH-1:2*DOUT_WIDTH];
-	  2'b11: assign dout = din[4*DOUT_WIDTH-1:3*DOUT_WIDTH];
-  endcase
+  assign dout = cfg[1] ? (cfg[0] ? din[4*DOUT_WIDTH-1:3*DOUT_WIDTH] : din[3*DOUT_WIDTH-1:2*DOUT_WIDTH]) : (cfg[0] ? din[2*DOUT_WIDTH-1:DOUT_WIDTH] : din[DOUT_WIDTH-1:0]);
 
 endmodule
