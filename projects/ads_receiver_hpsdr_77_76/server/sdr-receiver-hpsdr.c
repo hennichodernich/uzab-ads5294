@@ -51,9 +51,9 @@ int main(int argc, char *argv[])
 
   errno = 0;
   number = (argc == 3) ? strtol(argv[2], &end, 10) : -1;
-  if(errno != 0 || end == argv[2] || number < 1 || number > 4)
+  if(errno != 0 || end == argv[2] || number < 1 || number > 6)
   {
-      fprintf(stderr, "Usage: sdr-receiver-hpsdr interface 1|2|3|4\n");
+      fprintf(stderr, "Usage: sdr-receiver-hpsdr interface 1|2|3|4|5|6\n");
       return EXIT_FAILURE;
   }
   chan = (number - 1);

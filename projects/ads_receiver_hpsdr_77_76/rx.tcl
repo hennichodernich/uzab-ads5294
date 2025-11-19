@@ -23,7 +23,7 @@ cell pavel-demin:user:port_slicer slice_1 {
 
 # Create port_slicer
 cell pavel-demin:user:port_slicer slice_2 {
-  DIN_WIDTH 288 DIN_FROM 9 DIN_TO 8
+  DIN_WIDTH 288 DIN_FROM 10 DIN_TO 8
 } {
   din hub_0/cfg_data
 }
@@ -31,7 +31,7 @@ cell pavel-demin:user:port_slicer slice_2 {
 for {set i 0} {$i <= 7} {incr i} {
 
   # Create port_selector
-  cell pavel-demin:user:quattro_selector selector_$i {
+  cell pavel-demin:user:hex_selector selector_$i {
     DOUT_WIDTH 14
   } {
     cfg slice_2/dout
