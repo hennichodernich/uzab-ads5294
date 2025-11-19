@@ -3,10 +3,10 @@ create_bd_port -dir I lclk_p_0
 create_bd_port -dir I lclk_n_0
 create_bd_port -dir I aclk_p_0
 create_bd_port -dir I aclk_n_0
-create_bd_port -dir I -from 5 -to 0 din_a_p_0
-create_bd_port -dir I -from 5 -to 0 din_a_n_0
-create_bd_port -dir I -from 5 -to 0 din_b_p_0
-create_bd_port -dir I -from 5 -to 0 din_b_n_0
+create_bd_port -dir I -from 7 -to 0 din_a_p_0
+create_bd_port -dir I -from 7 -to 0 din_a_n_0
+create_bd_port -dir I -from 7 -to 0 din_b_p_0
+create_bd_port -dir I -from 7 -to 0 din_b_n_0
 
 create_bd_port -dir O adc_spi_sclk
 create_bd_port -dir O adc_spi_mosi
@@ -95,7 +95,7 @@ cell pavel-demin:user:port_slicer slice_1 {
 
 # ADC
 cell hnch:user:axis_ads5294_twolane_doubleword axis_ads5294_twolane_0 {
-  NUMBER_OF_LANES 6
+  NUMBER_OF_LANES 8
 } {
   frame_clock_p aclk_p_0
   frame_clock_n aclk_n_0

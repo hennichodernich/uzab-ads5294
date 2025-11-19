@@ -31,7 +31,7 @@ cell pavel-demin:user:port_slicer slice_2 {
 for {set i 0} {$i <= 7} {incr i} {
 
   # Create port_selector
-  cell pavel-demin:user:hex_selector selector_$i {
+  cell pavel-demin:user:octa_selector selector_$i {
     DOUT_WIDTH 14
   } {
     cfg slice_2/dout
